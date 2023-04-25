@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js" ></script>
+
+        <script>
+
+            async function load() {
+                 const url = 'https://oonawith2o.github.io/ITS365-PROJECT/model.json';
+                 const model = await tf.loadLayersModel(url);
+                 return model;
+            };
+            
+            function predict(model) {
+                const Age = document.getElementById('Age').value;
+                const Games = document.getElementById('Games').value;
+                const Minutes = document.getElementById('Minutes').value;
+                const FGM = document.getElementById('FGM').value;
+                const FGA = document.getElementById('FGA').value;
+                const FTM = document.getElementById('FGM').value;
+                const FTA = document.getElementById('FGA').value;
+                const ORB = document.getElementById('ORB').value;
+                const TRB = document.getElementById('TRB').value;
+                const AST = document.getElementById('AST').value;
+                const STL = document.getElementById('STL').value;
+                const BLK = document.getElementById('BLK').value;
+                const PF = document.getElementById('PF').value;
+                const PTS = document.getElementById('PTS').value;
+                const FGP = document.getElementById('FG%').value * .01;
+                const FTP = document.getElementById('FT%').value * .01;
+                const MPG = document.getElementById('MPG').value;
+                const PPG = document.getElementById('PPG').value;
+                const RPG = document.getElementById('RPG').value;
+                const APG = document.getElementById('APG').value;
+
+
+                const inputTensor = tf.tensor([[parseInt(Age), parseInt(Games), parseInt(Minutes),
+                                                parseInt(FGM), parseInt(FGA), parseInt(FTM),
+                                                parseInt(FTA), parseInt(ORB), parseInt(TRB),
+                                                parseInt(AST), parseInt(STL), parseInt(BLK),
+                                                parseInt(PF), parseInt(PTS), parseFloat(FGP),
+                                                parseFloat(FTP), parseFloat(MPG), parseFloat(PPG),
+                                                parseFloat(RPG), parseFloat(APG)
+                ]]);
+                
+                model.then(model => {
+                    let result = model.predict(inputTensor);
+                    alert(result);
+                });
+            };
+            
+            const model = load();
+            
+            </script>
+    </head>
+    <body>
+        Age: <input id="userInput" type="Age">  </input><br>
+        Games Played: <input id="userInput" type="Games">  </input><br>
+        Minutes Logged: <input id="userInput" type="Minutes">  </input><br>
+        Field Goals Made: <input id="userInput" type="FGM">  </input><br>
+        Field Goals Attempted: <input id="userInput" type="FGA">  </input><br>
+        Free Throws Made: <input id="userInput" type="FTM">  </input><br>
+        Free Throws Attempted: <input id="userInput" type="FTA">  </input><br>
+        Offensive Rebounds: <input id="userInput" type="ORB">  </input><br>
+        Total Rebounds: <input id="userInput" type="TRB">  </input><br>
+        Assists: <input id="userInput" type="Assists">  </input><br>
+        Steals: <input id="userInput" type="STL">  </input><br>
+        Blocks: <input id="userInput" type="BLK">  </input><br>
+        Personal Fouls: <input id="userInput" type="PF">  </input><br>
+        Points: <input id="userInput" type="PTS">  </input><br>
+        Field Goal Percentage: <input id="userInput" type="FG%">  </input><br>
+        Free Throw Percentage: <input id="userInput" type="FT%">  </input><br>
+        Minutes Per Game: <input id="userInput" type="MPG">  </input><br>
+        Points Per Game: <input id="userInput" type="PPG">  </input><br>
+        Rebounds Per Game: <input id="userInput" type="RPG">  </input><br>
+        Assists Per Game: <input id="userInput" type="APG">  </input><br>
+        <button onclick="predict(model)">Predict</button>
+    </body>
+</html>
