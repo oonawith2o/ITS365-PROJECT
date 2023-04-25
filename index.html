@@ -1,91 +1,246 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js" ></script>
+        <!-- Loading data -->
+        <script>
+            function searchWS25(){
+            fetch('https://oonawith2o.github.io/ITS365-PROJECT/OVER_25.csv')
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.split('\n');
+                    const headers = rows[0].split(',');
+                    const result = [];
+                    for(let i = 1; i < rows.length; i++){
+                        const row = rows[i].split(',');
+                        if (row.length === headers.length){
+                            const obj = {};
+                            for(let j = 0; j < headers.length; j++){
+                                obj[headers[j]] = row[j];
+                            }
+                            result.push(obj);
+                        }
+                    }
+
+                    console.log(result);
+
+                    const name = document.getElementById('WS25Search').value;
+                    const row = result.find(row => row.Player === name);
+
+                    console.log(row);
+
+                    if (row) {
+                        document.getElementById('WS25name').textContent = row.Player;
+                        const actual = row.WS25;
+                        document.getElementById('WS25').innerHTML = actual;
+
+
+                        var playerID = row.PlayerID;
+                        var imgLink = 'https://www.basketball-reference.com/req/202106291/images/players/' + playerID + '.jpg';
+                        document.getElementById("playerImgWS25").src = imgLink;
+
+                        const model = load();
+                        predict(model, row);
+
+                    } else {
+                        console.log(`Player ${name} not found in data`);
+                        alert("Player not found. Please search again.")
+                    }
+                })
+            }
+        </script>
 
         <script>
+            function searchNoWS25(){
+            fetch('https://oonawith2o.github.io/ITS365-PROJECT/UNDER_25.csv')
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.split('\n');
+                    const headers = rows[0].split(',');
+                    const result = [];
+                    for(let i = 1; i < rows.length; i++){
+                        const row = rows[i].split(',');
+                        if (row.length === headers.length){
+                            const obj = {};
+                            for(let j = 0; j < headers.length; j++){
+                                obj[headers[j]] = row[j];
+                            }
+                            result.push(obj);
+                        }
+                    }
 
+                    const model = load();
+                    console.log(result);
+
+                    const name = document.getElementById('NoWS25Search').value;
+                    const row = result.find(row => row.Player === name);
+
+                    console.log(row);
+
+                    if (row) {
+                        document.getElementById('NoWS25name').textContent = row.Player;
+
+                        var playerID = row.PlayerID;
+                        var imgLink = 'https://www.basketball-reference.com/req/202106291/images/players/' + playerID + '.jpg';
+                        document.getElementById("playerImgNoWS25").src = imgLink;
+
+                        const model = load();
+                        predict(model, row);
+                    } else {
+                        console.log(`Player ${name} not found in data`);
+                        alert("Player not found. Please search again.")
+                    }
+                })
+                
+            }
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js" ></script>
+
+
+        <script>
             async function load() {
-
                 class L2 {
                     static className = 'L2';
-                    constructor(config) {
-                        return tf.regularizers.l1l2(config)
+                    constructor(config){
+                        return tf.regularizers.l1l2(config);
                     }
                 }
-                
+
                 tf.serialization.registerClass(L2);
 
-                 const url = 'https://oonawith2o.github.io/ITS365-PROJECT/Model-ITS365-RAW//model.json';
-                 const model = await tf.loadLayersModel(url);
-                 return model;
+
+                const url = 'https://oonawith2o.github.io/ITS365-PROJECT/Model-ITS365-RAW/model.json';
+                const model = await tf.loadLayersModel(url);
+                return model;
             };
-            
-            function predict(model) {
-                const Age = document.getElementById('Age').value;
-                const Games = document.getElementById('Games').value;
-                const Minutes = document.getElementById('Minutes').value;
-                const FGM = document.getElementById('FGM').value;
-                const FGA = document.getElementById('FGA').value;
-                const FTM = document.getElementById('FGM').value;
-                const FTA = document.getElementById('FGA').value;
-                const ORB = document.getElementById('ORB').value;
-                const TRB = document.getElementById('TRB').value;
-                const AST = document.getElementById('AST').value;
-                const STL = document.getElementById('STL').value;
-                const BLK = document.getElementById('BLK').value;
-                const PF = document.getElementById('PF').value;
-                const PTS = document.getElementById('PTS').value;
-                const FGP = document.getElementById('FGP').value * .01;
-                const FTP = document.getElementById('FTP').value * .01;
-                const MPG = document.getElementById('MPG').value;
-                const PPG = document.getElementById('PPG').value;
-                const RPG = document.getElementById('RPG').value;
-                const APG = document.getElementById('APG').value;
 
+            const model = load();
 
-                const inputTensor = tf.tensor([[parseInt(Age), parseInt(Games), parseInt(Minutes),
+            function predict(model, row) {
+                console.log(row.Age)
+                const Age = row.Age;
+                const Games = row.Games;
+                const Minutes = row.Minutes;
+                const FGM = row.FGM;
+                const FGA = row.FGA;
+                const FTM = row.FTM;
+                const FTA = row.FTA;
+                const ORB = row.ORB;
+                const TRB = row.TRB;
+                const AST = row.AST;
+                const STL = row.STL;
+                const BLK = row.BLK;
+                const PF = row.PF;
+                const PTS = row.PTS;
+                const FGP = row.FGP;
+                const FTP = row.FTP;
+                const MPG = row.MPG;
+                const PPG = row.PPG;
+                const RPG = row.RPG;
+                const APG = row.APG;
+
+                const inputTensor = tf.tensor([parseInt(Age), parseInt(Games), parseInt(Minutes),
                                                 parseInt(FGM), parseInt(FGA), parseInt(FTM),
                                                 parseInt(FTA), parseInt(ORB), parseInt(TRB),
                                                 parseInt(AST), parseInt(STL), parseInt(BLK),
                                                 parseInt(PF), parseInt(PTS), parseFloat(FGP),
                                                 parseFloat(FTP), parseFloat(MPG), parseFloat(PPG),
                                                 parseFloat(RPG), parseFloat(APG)
-                ]]);
+                ]);
+
+                const inputTensor_reshaped = tf.reshape(inputTensor, [1, 20]);
+
+                console.log(inputTensor_reshaped);
+
+                console.log(inputTensor.dataSync());
                 
                 model.then(model => {
-                    let tensor_result = model.predict(inputTensor);
-                    let result = tensor_result.dataSync()[0]
-                    console.log(result)
-                    alert("The Win Share of the Selected Player is: " + result.toFixed(2));
+                    let tensor_result = model.predict(inputTensor_reshaped);
+                    let result = tensor_result.dataSync()[0].toFixed(2);
+                    document.getElementById('WS25Pred').innerHTML = result;
+                    document.getElementById('NoWS25Pred').innerHTML = result;
                 });
             };
             
-            const model = load();
             
-            </script>
+        </script>
+
+
+        <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+
+        <script>
+            function WS25(){
+                document.getElementById("WS25Players").style.display = "inline";
+                document.getElementById("NoWS25Players").style.display = "none";
+                document.getElementById("NoWS25Display").style.display = "none";
+            }
+
+            function NoWS25(){
+                document.getElementById("NoWS25Players").style.display = "inline";
+                document.getElementById("WS25Players").style.display = "none";
+                document.getElementById("WS25Display").style.display = "none";
+            }
+
+            function WS25Display(){
+                document.getElementById("WS25Display").style.display = "inline";
+            }
+
+            function NoWS25Display(){
+                document.getElementById("NoWS25Display").style.display = "inline";
+            }
+        </script>
     </head>
     <body>
-        Age: <input id="Age" type="text">  </input><br>
-        Games Played: <input id="Games" type="text">  </input><br>
-        Minutes Logged: <input id="Minutes" type="text">  </input><br>
-        Field Goals Made: <input id="FGM" type="text">  </input><br>
-        Field Goals Attempted: <input id="FGA" type="text">  </input><br>
-        Free Throws Made: <input id="FTM" type="text">  </input><br>
-        Free Throws Attempted: <input id="FTA" type="text">  </input><br>
-        Offensive Rebounds: <input id="ORB" type="text">  </input><br>
-        Total Rebounds: <input id="TRB" type="text">  </input><br>
-        Assists: <input id="AST" type="text">  </input><br>
-        Steals: <input id="STL" type="text">  </input><br>
-        Blocks: <input id="BLK" type="text">  </input><br>
-        Personal Fouls: <input id="PF" type="text">  </input><br>
-        Points: <input id="PTS" type="text">  </input><br>
-        Field Goal Percentage: <input id="FGP" type="text">  </input><br>
-        Free Throw Percentage: <input id="FTP" type="text">  </input><br>
-        Minutes Per Game: <input id="MPG" type="text">  </input><br>
-        Points Per Game: <input id="PPG" type="text">  </input><br>
-        Rebounds Per Game: <input id="RPG" type="text">  </input><br>
-        Assists Per Game: <input id="APG" type="text">  </input><br>
-        <button onclick="predict(model)">Predict</button>
+        <h2>Search for player</h2>
+
+        <button onclick="WS25()">Players 25 and older</button>
+        <button onclick="NoWS25()">Players younger than 25</button>
+
+        <div id="WS25Players"> <!-- div for players that have WS25 value -->
+            <h4>Players 25 and older</h4>
+            <form>
+                <!-- Text area for search button -->
+                <input id='WS25Search' type="text">
+                <button type="submit" onclick="event.preventDefault(); WS25Display(); searchWS25()">Search</button> <!-- On click needs to change to predict -->
+            </form>
+            <div id="WS25Display" style="display: none;"> 
+                <!-- Set visible after searched -->
+
+                <!-- Show name -->
+                <p id="WS25name"></p>
+
+                <!-- Show headshot of player from basketball reference (use playerid and link) -->
+                <img id="playerImgWS25" src="" alt="Player image">
+                
+                <!-- Show predicted WS25 by going through model -->
+                <p>Predicted: <span id='WS25Pred'></span></p>
+
+                <!-- Show actual WS25 -->
+                <p>Actual: <span id='WS25'></span></p>
+            </div>
+        </div>
+        <div id="NoWS25Players" style="display: none;"> <!-- div for players that do not have a WS25 value (too young, need to predict) -->
+            <h4>Players younger than 25</h4>
+            <form>
+                <!-- Text area for search button -->
+                <input id='NoWS25Search' type="text">
+                <button type="submit" onclick="event.preventDefault(); NoWS25Display(); searchNoWS25()">Search</button> <!-- On click needs to change to predict -->
+            </form>
+            <div id="NoWS25Display" style="display: none;"> 
+                <!-- Set visible after searched -->
+
+                <!-- Show name -->
+                <p id="NoWS25name"></p>
+
+                <!-- Show headshot of player from basketball reference -->
+                <img id="playerImgNoWS25" src="" alt="Player image">
+
+                <!-- Show predicted WS25 by going through model -->
+                <p>Predicted: <span id='NoWS25Pred'></span></p>
+
+                <!-- From actual values, show players with similar actual WS25 values (??) -->
+                <!-- <p>Similar players: </p> -->
+            </div>
+        </div>
     </body>
 </html>
