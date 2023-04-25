@@ -43,7 +43,9 @@
 
                     } else {
                         console.log(`Player ${name} not found in data`);
-                        alert("Player not found. Please search again.")
+                        alert("Player not found. Please search again.");
+                        document.getElementById('WS25Pred').innerHTML = "";
+                        document.getElementById('NoWS25Pred').innerHTML = "";
                     }
                 })
             }
@@ -87,7 +89,9 @@
                         predict(model, row);
                     } else {
                         console.log(`Player ${name} not found in data`);
-                        alert("Player not found. Please search again.")
+                        alert("Player not found. Please search again.");
+                        document.getElementById('WS25Pred').innerHTML = "";
+                        document.getElementById('NoWS25Pred').innerHTML = "";
                     }
                 })
                 
